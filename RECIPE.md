@@ -32,9 +32,9 @@ blocks, base type 13px. Top to bottom:
   right edge when there are more than 9. `No branch matches.` when the filter hides
   everything.
 - **Name**: a label and the name input (placeholder `new branch name`).
-- **What Enter does**, in `muted`: `New branch feat-x from origin/main.` with the
-  folder under it at 11.5px `dim` (`~/.herdr/worktrees/acme-web/feat-x`);
-  `Checks out the existing branch x (the base isn't used).`; or
+- **Where it goes**: the folder at 11.5px `dim` (`~/.herdr/worktrees/acme-web/feat-x`).
+  Only when Enter does something other than make a new branch, a `muted` line above it:
+  `Checks out the existing branch x (the base isn't used).`; or, instead of the folder,
   `x is already checked out at <path>. ↵ goes there.`
 - **Error**, when there is one, in `blocked`.
 - **Footer**, 6px above it: on the right, key hints 14px apart, each a key chip (5px by

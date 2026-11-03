@@ -409,11 +409,11 @@ export default class NewWorktree extends View {
     const p = G.plan(this.name.value(), this.base(), this.data);
     if (p.error) return div().text_color(t.dim).child(p.error);
     if (p.mode === "open") return div().text_color(t.muted).child(`${p.name} is already checked out at ${tilde(p.path, this.userHome)}. ↵ goes there.`);
-    const what = p.mode === "existing" ? `Checks out the existing branch ${p.name} (the base isn't used).` : `New branch ${p.name} from ${p.base.label}.`;
-    return v_flex()
-      .gap(2)
-      .child(div().text_color(t.muted).child(what))
-      .child(div().truncate().text_size(11.5).text_color(t.dim).child(`${tilde(ROOT(this.userHome), this.userHome)}/${this.repo.name}/${G.slug(p.name)}`));
+    const where = div().truncate().text_size(11.5).text_color(t.dim).child(`${tilde(ROOT(this.userHome), this.userHome)}/${this.repo.name}/${G.slug(p.name)}`);
+    // A new branch needs no sentence: the name and the base are right above. Only say so
+    // when Enter does something else.
+    if (p.mode === "new") return where;
+    return v_flex().gap(2).child(div().text_color(t.muted).child(`Checks out the existing branch ${p.name} (the base isn't used).`)).child(where);
   }
 
   // A key and what it does, spaced so the row reads as separate hints (as in Worktrees).
