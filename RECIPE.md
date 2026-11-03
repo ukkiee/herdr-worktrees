@@ -33,13 +33,16 @@ blocks, base type 13px. Top to bottom:
   everything.
 - **Name**: a label and the name input (placeholder `new branch name`).
 - **Where it goes**: the folder at 11.5px `dim` (`~/.herdr/worktrees/acme-web/feat-x`).
-  Only when Enter does something other than make a new branch, a `muted` line above it:
-  `Checks out the existing branch x (the base isn't used).`; or, instead of the folder,
-  `x is already checked out at <path>. ↵ goes there.`
+- **A taken name** turns the name field's border `blocked` and adds one truncated
+  `blocked` line, without repeating the name: `Already checked out in <folder>.` (in
+  place of the folder), `This branch already exists: ↵ checks it out, the base isn't
+  used.`, or `Already on the remote as origin/x; to continue it, pick it as the base.`
+  (a remote branch of that name other than the selected base).
 - **Error**, when there is one, in `blocked`.
 - **Footer**, 6px above it: on the right, key hints 14px apart, each a key chip (5px by
   1px padding, radius 4, 1px `border` outline, `raised` fill, 11px `muted`) and its word
-  at 11.5px `dim`: `↑↓ base`, `tab filter ↔ name`, `↵ create`, `esc close`. While
+  at 11.5px `dim`: `↑↓ base`, `tab filter ↔ name`, `↵ create` (`↵ open` or
+  `↵ check out` when the name is an existing branch), `esc close`. While
   creating: on the left a braille spinner (`⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏`, 90 ms a frame) in `accent`
   and the step at 12px `muted`, truncating first (`Fetching origin/main…`,
   `Checking out into ~/.herdr/worktrees/…`, `Running worktree setup…`); the hints become

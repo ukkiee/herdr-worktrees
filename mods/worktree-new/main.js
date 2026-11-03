@@ -404,16 +404,24 @@ export default class NewWorktree extends View {
       );
   }
 
-  preview(t) {
-    if (!this.repo || !this.data) return div();
-    const p = G.plan(this.name.value(), this.base(), this.data);
+  // Why the typed name is taken, or "". The name is in the field right above, so the
+  // message doesn't repeat it; the footer's ↵ hint says what Enter does instead.
+  clash(p) {
+    if (!p || p.error) return "";
+    if (p.mode === "open") return `Already checked out in ${p.path.split("/").pop()}.`;
+    if (p.mode === "existing") return "This branch already exists: ↵ checks it out, the base isn't used.";
+    // A new local branch named like someone's remote one would start from the wrong base.
+    const other = this.data.candidates.find((c) => c.remote && c.name === p.name && c.ref !== p.base.ref);
+    return other ? `Already on the remote as ${other.label}; to continue it, pick it as the base.` : "";
+  }
+
+  preview(t, p, clash) {
+    if (!p) return div();
     if (p.error) return div().text_color(t.dim).child(p.error);
-    if (p.mode === "open") return div().text_color(t.muted).child(`${p.name} is already checked out at ${tilde(p.path, this.userHome)}. ↵ goes there.`);
+    const say = clash ? div().truncate().text_color(t.blocked).child(clash) : null;
+    if (p.mode === "open") return say;
     const where = div().truncate().text_size(11.5).text_color(t.dim).child(`${tilde(ROOT(this.userHome), this.userHome)}/${this.repo.name}/${G.slug(p.name)}`);
-    // A new branch needs no sentence: the name and the base are right above. Only say so
-    // when Enter does something else.
-    if (p.mode === "new") return where;
-    return v_flex().gap(2).child(div().text_color(t.muted).child(`Checks out the existing branch ${p.name} (the base isn't used).`)).child(where);
+    return say ? v_flex().gap(2).child(say).child(where) : where;
   }
 
   // A key and what it does, spaced so the row reads as separate hints (as in Worktrees).
@@ -429,8 +437,11 @@ export default class NewWorktree extends View {
   render() {
     const t = theme();
     const r = this.repo;
-    const field = (state, focus) =>
-      Input.new(state).h(32).px(10).items_center().rounded(6).border(1).border_color(this.focus === focus ? t.accent : t.input).bg(t.background).text_color(t.foreground);
+    const field = (state, focus, alert = false) =>
+      Input.new(state).h(32).px(10).items_center().rounded(6).border(1).border_color(alert ? t.blocked : this.focus === focus ? t.accent : t.input).bg(t.background).text_color(t.foreground);
+    const p = r && this.data ? G.plan(this.name.value(), this.base(), this.data) : null;
+    const clash = this.clash(p);
+    const enter = p?.mode === "open" ? "open" : p?.mode === "existing" ? "check out" : "create";
     const label = (text) => div().pt(4).text_size(11).text_color(t.dim).child(text);
     const count = this.data ? (this.shown.length === this.data.candidates.length ? `${this.shown.length}` : `${this.shown.length}/${this.data.candidates.length}`) : "";
 
@@ -461,8 +472,8 @@ export default class NewWorktree extends View {
             .child(field(this.filter, "filter"))
             .child(this.list(t))
             .child(label("Name"))
-            .child(field(this.name, "name"))
-            .child(this.preview(t)),
+            .child(field(this.name, "name", Boolean(clash)))
+            .child(this.preview(t, p, clash)),
         ),
       )
       .when(Boolean(this.error), (el) => el.child(div().text_color(t.blocked).child(this.error)))
@@ -485,7 +496,7 @@ export default class NewWorktree extends View {
             el
               .child(this.hint(t, "↑↓", "base"))
               .child(this.hint(t, "tab", "filter ↔ name"))
-              .child(this.hint(t, "↵", "create"))
+              .child(this.hint(t, "↵", enter))
               .child(this.hint(t, "esc", "close")),
           ),
       );
