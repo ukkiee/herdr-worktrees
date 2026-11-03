@@ -16,7 +16,7 @@ A modal dialog, 560×540 px, on the `popover` background, 16px padding, 6px betw
 blocks, base type 13px. Top to bottom:
 
 - **Header**: `New worktree · <repo>` semibold in `foreground` (plus ` (<machine>)` for a
-  space on another machine); `esc` at 11px `dim` on the right.
+  space on another machine).
 - **Background errors**, only when a creation finished after its dialog closed and
   failed: `Earlier, in the background: <the last three>` at 12px in `blocked`.
 - **Base**: a label row, `Base` left and the count right (`24`, or `3/24` while
@@ -37,11 +37,13 @@ blocks, base type 13px. Top to bottom:
   `Checks out the existing branch x (the base isn't used).`; or
   `x is already checked out at <path>. ↵ goes there.`
 - **Error**, when there is one, in `blocked`.
-- **Footer**, 11px `dim`: `↑↓ base · tab filter/name · ↵ create` on the right. While
-  creating: a braille spinner (`⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏`, 90 ms a frame) in `accent`, the step
-  in `muted` (`Fetching origin/main…`, `Checking out into ~/.herdr/worktrees/…`,
-  `Running worktree setup…`), and `esc keeps it going in the background` on the right;
-  the body above drops to 55% opacity.
+- **Footer**, 6px above it: on the right, key hints 14px apart, each a key chip (5px by
+  1px padding, radius 4, 1px `border` outline, `raised` fill, 11px `muted`) and its word
+  at 11.5px `dim`: `↑↓ base`, `tab filter ↔ name`, `↵ create`, `esc close`. While
+  creating: on the left a braille spinner (`⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏`, 90 ms a frame) in `accent`
+  and the step at 12px `muted`, truncating first (`Fetching origin/main…`,
+  `Checking out into ~/.herdr/worktrees/…`, `Running worktree setup…`); the hints become
+  one, `esc finish in background`, and the body above drops to 55% opacity.
 
 Both inputs are 32px tall, radius 6, 10px side padding, `background` fill, a 1px
 border in `accent` when focused and `input` otherwise.

@@ -416,6 +416,16 @@ export default class NewWorktree extends View {
       .child(div().truncate().text_size(11.5).text_color(t.dim).child(`${tilde(ROOT(this.userHome), this.userHome)}/${this.repo.name}/${G.slug(p.name)}`));
   }
 
+  // A key and what it does, spaced so the row reads as separate hints (as in Worktrees).
+  hint(t, key, label) {
+    return h_flex()
+      .flex_none()
+      .gap(6)
+      .items_center()
+      .child(div().px(5).py(1).rounded(4).border(1).border_color(t.border).bg(t.raised).text_size(11).text_color(t.muted).child(key))
+      .child(div().text_size(11.5).text_color(t.dim).child(label));
+  }
+
   render() {
     const t = theme();
     const r = this.repo;
@@ -434,10 +444,7 @@ export default class NewWorktree extends View {
       .bg(t.popover)
       .text_size(13)
       .child(
-        h_flex()
-          .items_center()
-          .child(div().flex_1().font_semibold().text_color(t.foreground).child(`New worktree${r ? ` · ${r.name}` : ""}${this.on ? ` (${this.on})` : ""}`))
-          .child(div().text_size(11).text_color(t.dim).child("esc")),
+        div().font_semibold().text_color(t.foreground).child(`New worktree${r ? ` · ${r.name}` : ""}${this.on ? ` (${this.on})` : ""}`),
       )
       .when(Boolean(this.notice), (el) => el.child(div().text_size(12).text_color(t.blocked).child(`Earlier, in the background: ${this.notice}`)))
       .when(r === undefined, (el) => el.child(div().text_color(t.muted).child("Reading the repo…")))
@@ -460,15 +467,27 @@ export default class NewWorktree extends View {
       )
       .when(Boolean(this.error), (el) => el.child(div().text_color(t.blocked).child(this.error)))
       .child(
+        // The status takes what's left and truncates; the hints keep their size.
         h_flex()
-          .pt(4)
-          .gap(6)
+          .pt(6)
+          .gap(14)
           .items_center()
-          .text_size(11)
-          .text_color(t.dim)
-          .when(this.busy, (el) => el.child(div().text_color(t.accent).frames(["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"], 90)).child(div().min_w(0).truncate().text_color(t.muted).child(this.status || "Working…")))
-          .child(div().flex_1())
-          .child(this.busy ? "esc keeps it going in the background" : "↑↓ base · tab filter/name · ↵ create"),
+          .child(
+            h_flex()
+              .flex_1()
+              .min_w(0)
+              .gap(8)
+              .items_center()
+              .when(this.busy, (el) => el.child(div().flex_none().text_size(12).text_color(t.accent).frames(["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"], 90)).child(div().min_w(0).truncate().text_size(12).text_color(t.muted).child(this.status || "Working…"))),
+          )
+          .when(this.busy, (el) => el.child(this.hint(t, "esc", "finish in background")))
+          .when(!this.busy, (el) =>
+            el
+              .child(this.hint(t, "↑↓", "base"))
+              .child(this.hint(t, "tab", "filter ↔ name"))
+              .child(this.hint(t, "↵", "create"))
+              .child(this.hint(t, "esc", "close")),
+          ),
       );
   }
 }
