@@ -211,6 +211,18 @@ export async function worktreePaths(git, main) {
 
 // A free folder for the checkout: <root>/<repo>/<slug>, then -2, -3... A dangling
 // symlink or a stale registration counts as taken: git would refuse it.
+// Where checkouts go: settings.json `worktrees.directory`, the key the shipped worktree
+// mod reads, so both dialogs agree. A leading ~ is the home on the space's machine.
+export const DEFAULT_ROOT = "~/.herdr/worktrees";
+export function worktreeRoot(settingsText, userHome) {
+  const dir = (settingsText ? JSON.parse(settingsText) : {})?.worktrees?.directory ?? DEFAULT_ROOT;
+  if (typeof dir !== "string" || !dir.trim()) throw new Error("worktrees.directory must be a non-empty path.");
+  let path = dir;
+  if (path === "~" || path.startsWith("~/")) path = userHome.replace(/\/+$/, "") + path.slice(1);
+  if (!path.startsWith("/")) throw new Error("worktrees.directory must be an absolute path or start with ~/.");
+  return path.replace(/\/+$/, "") || "/";
+}
+
 export async function freePath(exec, on, root, repoName, name, registered = new Set()) {
   const stem = `${root}/${repoName}/${slug(name)}`;
   for (let n = 1; n < 100; n++) {

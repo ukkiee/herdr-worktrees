@@ -8,7 +8,8 @@
 화면을 앱으로 옮겼습니다.
 
 - **⌘⇧N New worktree**: 기준 브랜치를 고르고 새 브랜치 이름을 정하면
-  `~/.herdr/worktrees/<저장소>/<브랜치>`에 체크아웃하고 그 space를 엽니다. 기준을 먼저
+  `<worktrees.directory>/<저장소>/<브랜치>`에 체크아웃하고 그 space를 엽니다(앱
+  settings.json의 키, 기본값 `~/.herdr/worktrees`, Herdr 기본 New worktree와 같은 폴더). 기준을 먼저
   fetch해서 원격의 최신 커밋에서 시작합니다.
 - **⌘⇧O Worktrees**: 저장소의 모든 워크트리를 판정과 함께 보여 주고, 끝난 것만 지웁니다.
 

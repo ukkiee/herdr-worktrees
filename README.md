@@ -8,8 +8,9 @@ screen of [herdr-git-upstream](https://github.com/ukkiee/herdr-git-upstream) (a 
 plugin) to the app.
 
 - **⌘⇧N New worktree**: pick a base branch, name the new branch, and a space opens on the
-  checkout in `~/.herdr/worktrees/<repo>/<branch>`. The base is fetched first, so the
-  branch starts from what the remote has now.
+  checkout in `<worktrees.directory>/<repo>/<branch>` (the app's settings.json key, default
+  `~/.herdr/worktrees`, the same folder Herdr's own New worktree uses). The base is fetched
+  first, so the branch starts from what the remote has now.
 - **⌘⇧O Worktrees**: every worktree of the repo with a verdict, and removal of the
   finished ones.
 

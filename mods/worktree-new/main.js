@@ -4,11 +4,9 @@
 
 import { View, div } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input } from "gpui-base";
-import { run, props, closeOverlay, theme, spaces, panes, focused, exec, home, readTextFile, notify, nextCommand } from "herdr";
+import { run, props, closeOverlay, theme, spaces, panes, focused, exec, home, appHome, readTextFile, notify, nextCommand } from "herdr";
 import * as G from "./git.js";
 
-// Same folder as the shipped worktree mod and herdr's TUI.
-const ROOT = (userHome) => `${userHome}/.herdr/worktrees`;
 // Per-project setup steps the TUI ran on worktree.created (e.g. copying .env files).
 const SETUP_PLUGIN = "tdi.worktree-setup";
 // The list draws only the rows in view, like the app's command palette:
@@ -118,6 +116,7 @@ export default class NewWorktree extends View {
         if (r.code !== 0 || !r.stdout.trim()) throw new Error(`Could not find the home folder on ${this.on}.`);
         this.userHome = r.stdout.trim();
       } else this.userHome = home();
+      this.root = G.worktreeRoot(await readTextFile(`${appHome()}/settings.json`).catch(() => null), this.userHome);
       this.folder = folder || (this.space && place(this.space)) || this.userHome;
       const repo = await G.repoOf(this.git, this.folder);
       if (!repo) { this.repo = null; cx.notify(); return; }
@@ -304,7 +303,7 @@ export default class NewWorktree extends View {
     }
 
     const registered = await G.worktreePaths(this.git, this.repo.main);
-    const path = await G.freePath(exec, this.on, ROOT(this.userHome), this.repo.name, p.name, registered);
+    const path = await G.freePath(exec, this.on, this.root, this.repo.name, p.name, registered);
     const setup = this.on ? null : await this.setupCommand(path);
     // Left unnamed so the space follows its folder and nests under the repo's.
     const space = { folder: path, ...(this.on ? { machine: this.on } : {}) };
@@ -420,7 +419,7 @@ export default class NewWorktree extends View {
     if (p.error) return div().text_color(t.dim).child(p.error);
     const say = clash ? div().truncate().text_color(t.blocked).child(clash) : null;
     if (p.mode === "open") return say;
-    const where = div().truncate().text_size(11.5).text_color(t.dim).child(`${tilde(ROOT(this.userHome), this.userHome)}/${this.repo.name}/${G.slug(p.name)}`);
+    const where = div().truncate().text_size(11.5).text_color(t.dim).child(`${tilde(this.root, this.userHome)}/${this.repo.name}/${G.slug(p.name)}`);
     return say ? v_flex().gap(2).child(say).child(where) : where;
   }
 

@@ -129,6 +129,14 @@ symlinkSync(`${root}/nowhere`, `${wtRoot}/app/odd`);
 assert.equal(await g.freePath(exec, null, wtRoot, repo.name, "odd"), `${wtRoot}/app/odd-2`);
 assert.equal(await g.freePath(exec, null, wtRoot, repo.name, "ghost", new Set([`${wtRoot}/app/ghost`])), `${wtRoot}/app/ghost-2`);
 
+// the root follows settings.json worktrees.directory, ~ being the space machine's home
+assert.equal(g.worktreeRoot(null, "/home/me"), "/home/me/.herdr/worktrees");
+assert.equal(g.worktreeRoot('{"font":"x"}', "/home/me/"), "/home/me/.herdr/worktrees");
+assert.equal(g.worktreeRoot('{"worktrees":{"directory":"~/worktree/"}}', "/home/me"), "/home/me/worktree");
+assert.equal(g.worktreeRoot('{"worktrees":{"directory":"/srv/wt"}}', "/home/me"), "/srv/wt");
+assert.throws(() => g.worktreeRoot('{"worktrees":{"directory":"wt"}}', "/home/me"), /absolute/);
+assert.throws(() => g.worktreeRoot('{"worktrees":{"directory":" "}}', "/home/me"), /non-empty/);
+
 // existing local branch is checked out as is
 const p3 = g.plan("local-only", null, data);
 const path3 = await g.freePath(exec, null, wtRoot, repo.name, p3.name);
